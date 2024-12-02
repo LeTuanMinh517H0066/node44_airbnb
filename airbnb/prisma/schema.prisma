@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model bookings {
+  id        Int       @id @default(autoincrement())
+  room_id   Int?
+  user_id   Int?
+  checkin   DateTime? @db.DateTime(0)
+  checkout  DateTime? @db.DateTime(0)
+  regis_num Int?
+  rooms     rooms?    @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "bookings_ibfk_1")
+  users     users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "bookings_ibfk_2")
+
+  @@index([room_id], map: "room_id")
+  @@index([user_id], map: "user_id")
+}
+
+model comments {
+  id      Int       @id @default(autoincrement())
+  room_id Int?
+  user_id Int?
+  comment String?   @db.Text
+  date    DateTime? @db.DateTime(0)
+  rooms   rooms?    @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
+  users   users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
+
+  @@index([room_id], map: "room_id")
+  @@index([user_id], map: "user_id")
+}
+
+model locations {
+  id          Int     @id @default(autoincrement())
+  locate_name String? @db.VarChar(255)
+  city        String? @db.VarChar(255)
+  country     String? @db.VarChar(255)
+  image       String? @db.VarChar(255)
+  rooms       rooms[]
+}
+
+model rooms {
+  id          Int        @id @default(autoincrement())
+  room_name   String?    @db.VarChar(255)
+  guests      Int?
+  bed_rooms   Int?
+  beds        Int?
+  bath_rooms  Int?
+  description String?    @db.Text
+  price       Int?
+  washing     Boolean?   @default(false)
+  iron        Boolean?   @default(false)
+  tivi        Boolean?   @default(false)
+  cooler      Boolean?   @default(false)
+  wifi        Boolean?   @default(false)
+  kitchen     Boolean?   @default(false)
+  parking     Boolean?   @default(false)
+  pool        Boolean?   @default(false)
+  image       String?    @default("0") @db.VarChar(255)
+  user_id     Int?
+  locate_id   Int?
+  bookings    bookings[]
+  comments    comments[]
+  users       users?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "rooms_ibfk_1")
+  locations   locations? @relation(fields: [locate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "rooms_ibfk_2")
+
+  @@index([locate_id], map: "locate_id")
+  @@index([user_id], map: "user_id")
+}
+
+model users {
+  id        Int        @id @default(autoincrement())
+  name      String?    @db.VarChar(255)
+  email     String?    @db.VarChar(255)
+  pass_word String?    @db.VarChar(255)
+  phone     String?    @db.VarChar(255)
+  birth_day String?    @db.VarChar(255)
+  gender    Int?
+  role      Int?
+  bookings  bookings[]
+  comments  comments[]
+  rooms     rooms[]
+}
