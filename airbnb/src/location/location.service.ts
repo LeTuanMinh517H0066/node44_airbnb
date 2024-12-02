@@ -46,7 +46,7 @@ export class LocationService {
 
   async findOne(id: number): Promise<LocationDto> {
     try {
-      let location = await this.prisma.bookings.findFirst({
+      let location = await this.prisma.locations.findFirst({
         where: {
           id: id,
         },
